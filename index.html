@@ -29,21 +29,6 @@
     <div id="page" class="bg-white shadow mx-auto grid grid-cols-4 content-start box-content"
          style="width: 540px; height: 720px; padding: 36px;"></div>
   </main>
-  <!-- TEMPORARY demo render; replaced by src/app.js in the next task -->
-  <script type="module">
-    import { drawChord } from './src/draw.js';
-    const page = document.getElementById('page');
-    const demos = [
-      ['C', ['x', 3, 2, 0, 1, 0], 1],
-      ['Em', [0, 2, 2, 0, 0, 0], 1],
-      ['F#m/C#', ['x', 9, 7, 8, 9, 9], 7],
-    ];
-    for (const [name, strings, baseFret] of demos) {
-      const svg = drawChord(name, strings, baseFret);
-      svg.setAttribute('width', '135');
-      svg.setAttribute('height', '120');
-      page.append(svg);
-    }
-  </script>
+  <script type="module" src="src/app.js"></script>
 </body>
 </html>
