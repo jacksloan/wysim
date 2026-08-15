@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { fretWindow, cellRect, PAGE_CAPACITY } from '../src/layout.js';
+import { fretWindow, cellRect, PAGE_CAPACITY, gridFor, storedToDensity } from '../src/layout.js';
 
 describe('fretWindow', () => {
   it('keeps an open chord at base fret 1', () => {
@@ -47,5 +47,53 @@ describe('cellRect', () => {
 
   it('has a capacity of 24 chords', () => {
     expect(PAGE_CAPACITY).toBe(24);
+  });
+});
+
+describe('gridFor', () => {
+  it('normal matches the original 4x6 layout', () => {
+    const grid = gridFor('normal');
+    expect(grid.columns).toBe(4);
+    expect(grid.rows).toBe(6);
+    expect(grid.capacity).toBe(24);
+    expect(grid.cell).toEqual({ width: 135, height: 120 });
+    expect(grid.cellRect(0)).toEqual({ x: 36, y: 36, width: 135, height: 120 });
+    expect(grid.cellRect(23)).toEqual({ x: 441, y: 636, width: 135, height: 120 });
+  });
+
+  it('compact fits 5 per row, 7 rows, 35 chords', () => {
+    const grid = gridFor('compact');
+    expect(grid.columns).toBe(5);
+    expect(grid.rows).toBe(7);
+    expect(grid.capacity).toBe(35);
+    expect(grid.cell).toEqual({ width: 108, height: 96 });
+    expect(grid.cellRect(5)).toEqual({ x: 36, y: 132, width: 108, height: 96 });
+  });
+
+  it('spacious fits 3 per row, 4 rows, 12 chords', () => {
+    const grid = gridFor('spacious');
+    expect(grid.columns).toBe(3);
+    expect(grid.rows).toBe(4);
+    expect(grid.capacity).toBe(12);
+    expect(grid.cell).toEqual({ width: 180, height: 160 });
+    expect(grid.cellRect(11)).toEqual({ x: 396, y: 516, width: 180, height: 160 });
+  });
+
+  it('falls back to normal for an unknown density', () => {
+    expect(gridFor('bogus').columns).toBe(4);
+  });
+});
+
+describe('storedToDensity', () => {
+  it('reads a stored density', () => {
+    expect(storedToDensity('{"density":"compact"}')).toBe('compact');
+    expect(storedToDensity('{"density":"spacious"}')).toBe('spacious');
+  });
+
+  it('falls back to normal for null, junk, or unknown values', () => {
+    expect(storedToDensity(null)).toBe('normal');
+    expect(storedToDensity('garbage')).toBe('normal');
+    expect(storedToDensity('{"density":"huge"}')).toBe('normal');
+    expect(storedToDensity('{}')).toBe('normal');
   });
 });

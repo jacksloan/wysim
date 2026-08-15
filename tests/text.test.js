@@ -83,6 +83,14 @@ describe('textToChords', () => {
       { line: 25, message: 'Page full (24 chords)' },
     ]);
   });
+
+  it('respects a custom capacity', () => {
+    const result = textToChords('Am x02210\nC x32010\nG 320003', 2);
+    expect(result.chords).toHaveLength(2);
+    expect(result.errors).toEqual([
+      { line: 3, message: 'Page full (2 chords)' },
+    ]);
+  });
 });
 
 describe('storedToText', () => {

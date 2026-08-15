@@ -20,8 +20,18 @@
     </header>
     <p id="error" class="text-sm text-red-600 min-h-[1.25rem] mx-auto" style="width: 612px;"></p>
     <div class="relative group mx-auto w-fit">
-      <div id="page" class="bg-white shadow grid grid-cols-4 content-start box-content"
+      <div id="page" class="bg-white shadow grid content-start box-content"
            style="width: 540px; height: 720px; padding: 36px;"></div>
+      <button id="settings" aria-label="Chart settings" title="Chart settings"
+              class="absolute top-3 right-3 flex items-center justify-center w-10 h-10 rounded-full
+                     bg-gray-600 hover:bg-gray-700 text-white shadow-lg opacity-0
+                     group-hover:opacity-100 focus-visible:opacity-100 transition-opacity">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
       <button id="download" aria-label="Download PDF" title="Download PDF"
               class="absolute bottom-3 right-3 flex items-center justify-center w-10 h-10 rounded-full
                      bg-blue-600 hover:bg-blue-700 text-white shadow-lg opacity-0
@@ -32,6 +42,26 @@
         </svg>
       </button>
     </div>
+    <dialog id="settings-dialog" class="rounded-lg shadow-xl p-0 backdrop:bg-black/30">
+      <form method="dialog" class="p-5 space-y-4 w-64">
+        <h2 class="text-sm font-semibold">Chart settings</h2>
+        <fieldset class="space-y-2">
+          <legend class="text-xs font-medium text-gray-500 mb-1">Density</legend>
+          <label class="flex items-center gap-2 text-sm">
+            <input type="radio" name="density" value="compact"> Compact <span class="text-gray-400">(5 per row)</span>
+          </label>
+          <label class="flex items-center gap-2 text-sm">
+            <input type="radio" name="density" value="normal"> Normal <span class="text-gray-400">(4 per row)</span>
+          </label>
+          <label class="flex items-center gap-2 text-sm">
+            <input type="radio" name="density" value="spacious"> Spacious <span class="text-gray-400">(3 per row)</span>
+          </label>
+        </fieldset>
+        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded px-3 py-1.5 text-sm font-medium">
+          Done
+        </button>
+      </form>
+    </dialog>
   </main>
   <script type="module" src="src/app.js"></script>
 </body>

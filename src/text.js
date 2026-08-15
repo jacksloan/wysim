@@ -1,7 +1,7 @@
 import { parseTab } from './parse.js';
 import { fretWindow, PAGE_CAPACITY } from './layout.js';
 
-export function textToChords(text) {
+export function textToChords(text, capacity = PAGE_CAPACITY) {
   const chords = [];
   const errors = [];
   let pageFull = false;
@@ -18,9 +18,11 @@ export function textToChords(text) {
     if (!parsed.ok) return fail(parsed.error);
     const win = fretWindow(parsed.strings);
     if (!win.ok) return fail(win.error);
-    if (chords.length >= PAGE_CAPACITY) {
-      if (!pageFull) fail(`Page full (${PAGE_CAPACITY} chords)`);
-      pageFull = true;
+    if (chords.length >= capacity) {
+      if (!pageFull) {
+        fail(`Page full (${capacity} chords)`);
+        pageFull = true;
+      }
       return;
     }
 

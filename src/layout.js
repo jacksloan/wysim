@@ -23,6 +23,47 @@ export const CELL = {
   height: (PAGE.height - 2 * PAGE.margin) / ROWS,
 };
 
+export const DENSITIES = {
+  compact: { columns: 5 },
+  normal: { columns: 4 },
+  spacious: { columns: 3 },
+};
+
+export function gridFor(density) {
+  const { columns } = DENSITIES[density] ?? DENSITIES.normal;
+  const width = (PAGE.width - 2 * PAGE.margin) / columns;
+  const height = width * (CELL.height / CELL.width);
+  const rows = Math.floor((PAGE.height - 2 * PAGE.margin) / height);
+  return {
+    columns,
+    rows,
+    capacity: columns * rows,
+    cell: { width, height },
+    cellRect(index) {
+      const col = index % columns;
+      const row = Math.floor(index / columns);
+      return {
+        x: PAGE.margin + col * width,
+        y: PAGE.margin + row * height,
+        width,
+        height,
+      };
+    },
+  };
+}
+
+export function storedToDensity(stored) {
+  try {
+    const parsed = JSON.parse(stored);
+    if (typeof parsed?.density === 'string' && parsed.density in DENSITIES) {
+      return parsed.density;
+    }
+  } catch {
+    // junk stored value: fall through to default
+  }
+  return 'normal';
+}
+
 export function cellRect(index) {
   const col = index % COLUMNS;
   const row = Math.floor(index / COLUMNS);
