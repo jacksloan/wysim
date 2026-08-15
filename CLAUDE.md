@@ -18,7 +18,7 @@ A tool to quickly create guitar chord chart diagrams, outputting a PDF for 8.5x1
 
 Package manager is **pnpm** (pinned via `packageManager` in `package.json`).
 
-- `pnpm test` — run unit tests (vitest) for the pure logic in `src/parse.js` and `src/layout.js`
+- `pnpm test` — run unit tests (vitest) for the pure logic in `src/parse.js`, `src/layout.js`, and `src/text.js`
 - `pnpm test:watch` — vitest in watch mode
 - `pnpm dev` — serve the static app at http://localhost:8000 (no build step)
 
