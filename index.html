@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chord Chart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <main class="max-w-4xl mx-auto p-6 space-y-4">
+    <header class="flex items-end gap-3">
+      <div>
+        <label for="name" class="block text-xs font-medium text-gray-500">Chord name</label>
+        <input id="name" autocomplete="off" autofocus
+               class="w-32 rounded border border-gray-300 font-mono px-2 py-1" placeholder="Am7">
+      </div>
+      <div>
+        <label for="tab" class="block text-xs font-medium text-gray-500">Strings (low E &rarr; high E)</label>
+        <input id="tab" autocomplete="off"
+               class="w-40 rounded border border-gray-300 font-mono px-2 py-1" placeholder="x02010">
+      </div>
+      <div id="live-preview" class="w-16 h-16"></div>
+      <button id="download"
+              class="ml-auto bg-blue-600 hover:bg-blue-700 text-white rounded px-3 py-1.5 text-sm font-medium">
+        Download PDF
+      </button>
+    </header>
+    <p id="error" class="text-sm text-red-600 h-5"></p>
+    <div id="page" class="bg-white shadow mx-auto grid grid-cols-4 content-start box-content"
+         style="width: 540px; height: 720px; padding: 36px;"></div>
+  </main>
+  <!-- TEMPORARY demo render; replaced by src/app.js in the next task -->
+  <script type="module">
+    import { drawChord } from './src/draw.js';
+    const page = document.getElementById('page');
+    const demos = [
+      ['C', ['x', 3, 2, 0, 1, 0], 1],
+      ['Em', [0, 2, 2, 0, 0, 0], 1],
+      ['F#m/C#', ['x', 9, 7, 8, 9, 9], 7],
+    ];
+    for (const [name, strings, baseFret] of demos) {
+      const svg = drawChord(name, strings, baseFret);
+      svg.setAttribute('width', '135');
+      svg.setAttribute('height', '120');
+      page.append(svg);
+    }
+  </script>
+</body>
+</html>
