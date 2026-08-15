@@ -12,3 +12,24 @@ export function fretWindow(strings) {
   if (max <= SHOWN_FRETS) return { ok: true, baseFret: 1 };
   return { ok: true, baseFret: min };
 }
+
+export const COLUMNS = 4;
+export const ROWS = 6;
+export const PAGE_CAPACITY = COLUMNS * ROWS;
+
+export const PAGE = { width: 612, height: 792, margin: 36 };
+export const CELL = {
+  width: (PAGE.width - 2 * PAGE.margin) / COLUMNS,
+  height: (PAGE.height - 2 * PAGE.margin) / ROWS,
+};
+
+export function cellRect(index) {
+  const col = index % COLUMNS;
+  const row = Math.floor(index / COLUMNS);
+  return {
+    x: PAGE.margin + col * CELL.width,
+    y: PAGE.margin + row * CELL.height,
+    width: CELL.width,
+    height: CELL.height,
+  };
+}
