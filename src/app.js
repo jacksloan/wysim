@@ -1,7 +1,7 @@
 import { parseTab } from './parse.js';
 import { fretWindow, cellRect } from './layout.js';
 import { drawChord } from './draw.js';
-import { textToChords } from './text.js';
+import { textToChords, storedToText } from './text.js';
 
 const STORAGE_KEY = 'chord-chart-v1';
 const SHOWN_ERRORS = 3;
@@ -13,7 +13,7 @@ const downloadButton = document.getElementById('download');
 
 let chords = [];
 
-editor.value = loadText();
+editor.value = storedToText(localStorage.getItem(STORAGE_KEY));
 render();
 
 editor.addEventListener('input', render);
@@ -24,24 +24,6 @@ document.addEventListener('keydown', (e) => {
     downloadPdf();
   }
 });
-
-// Migrates the pre-text-interface JSON array format on first load.
-function loadText() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === null) return '';
-  try {
-    const parsed = JSON.parse(stored);
-    if (Array.isArray(parsed)) {
-      return parsed
-        .filter((c) => typeof c?.name === 'string' && typeof c?.tab === 'string')
-        .map((c) => `${c.name} ${c.tab}`)
-        .join('\n');
-    }
-  } catch {
-    // not JSON: already plain text
-  }
-  return stored;
-}
 
 function render() {
   const result = textToChords(editor.value);

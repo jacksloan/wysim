@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { textToChords } from '../src/text.js';
+import { textToChords, storedToText } from '../src/text.js';
 
 describe('textToChords', () => {
   it('parses one chord per line as "Name tabstring"', () => {
@@ -73,5 +73,41 @@ describe('textToChords', () => {
     expect(result.errors).toEqual([
       { line: 25, message: 'Page full (24 chords)' },
     ]);
+  });
+
+  it('reports a single page-full error no matter how many lines overflow', () => {
+    const lines = Array.from({ length: 27 }, (_, i) => `C${i} x32010`);
+    const result = textToChords(lines.join('\n'));
+    expect(result.chords).toHaveLength(24);
+    expect(result.errors).toEqual([
+      { line: 25, message: 'Page full (24 chords)' },
+    ]);
+  });
+});
+
+describe('storedToText', () => {
+  it('converts the legacy JSON array format to text lines', () => {
+    const legacy = JSON.stringify([
+      { name: 'Am', tab: 'x02210' },
+      { name: 'G', tab: '320003' },
+    ]);
+    expect(storedToText(legacy)).toBe('Am x02210\nG 320003');
+  });
+
+  it('returns plain text unchanged', () => {
+    expect(storedToText('Am x02210\nG 320003')).toBe('Am x02210\nG 320003');
+  });
+
+  it('returns empty string for null (nothing stored)', () => {
+    expect(storedToText(null)).toBe('');
+  });
+
+  it('falls back to raw text when a JSON array has malformed entries', () => {
+    expect(storedToText('["foo"]')).toBe('["foo"]');
+    expect(storedToText('[{"name":"Am"}]')).toBe('[{"name":"Am"}]');
+  });
+
+  it('falls back to raw text for JSON that is not an array', () => {
+    expect(storedToText('{"name":"Am"}')).toBe('{"name":"Am"}');
   });
 });
