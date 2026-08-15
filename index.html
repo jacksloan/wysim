@@ -42,9 +42,10 @@
         </svg>
       </button>
     </div>
-    <dialog id="settings-dialog" class="rounded-lg shadow-xl p-0 backdrop:bg-black/30">
+    <dialog id="settings-dialog" aria-labelledby="settings-dialog-title"
+            class="rounded-lg shadow-xl p-0 backdrop:bg-black/30">
       <form method="dialog" class="p-5 space-y-4 w-64">
-        <h2 class="text-sm font-semibold">Chart settings</h2>
+        <h2 id="settings-dialog-title" class="text-sm font-semibold">Chart settings</h2>
         <fieldset class="space-y-2">
           <legend class="text-xs font-medium text-gray-500 mb-1">Density</legend>
           <label class="flex items-center gap-2 text-sm">

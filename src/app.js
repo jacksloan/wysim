@@ -40,6 +40,7 @@ settingsDialog.addEventListener('change', (e) => {
   render();
 });
 settingsDialog.addEventListener('click', (e) => {
+  // Only a backdrop click targets the <dialog> itself; clicks inside land on the form.
   if (e.target === settingsDialog) settingsDialog.close();
 });
 

@@ -30,6 +30,9 @@ export const DENSITIES = {
 };
 
 export function gridFor(density) {
+  // The shipped column counts (3, 4, 5) divide the 540pt content width into
+  // whole points and the 8:9 cell ratio keeps heights integral; a new density
+  // whose columns don't divide 540 cleanly would produce sub-pixel cells.
   const { columns } = DENSITIES[density] ?? DENSITIES.normal;
   const width = (PAGE.width - 2 * PAGE.margin) / columns;
   const height = width * (CELL.height / CELL.width);
