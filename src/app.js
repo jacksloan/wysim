@@ -1,26 +1,22 @@
 import { parseTab } from './parse.js';
-import { fretWindow, PAGE_CAPACITY, cellRect } from './layout.js';
+import { fretWindow, cellRect } from './layout.js';
 import { drawChord } from './draw.js';
+import { textToChords } from './text.js';
 
 const STORAGE_KEY = 'chord-chart-v1';
+const SHOWN_ERRORS = 3;
 
-const nameInput = document.getElementById('name');
-const tabInput = document.getElementById('tab');
-const livePreview = document.getElementById('live-preview');
+const editor = document.getElementById('editor');
 const errorLine = document.getElementById('error');
 const page = document.getElementById('page');
 const downloadButton = document.getElementById('download');
 
-let chords = loadChords();
-renderPage();
+let chords = [];
 
-nameInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') tabInput.focus();
-});
-tabInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') commit();
-});
-tabInput.addEventListener('input', renderLivePreview);
+editor.value = loadText();
+render();
+
+editor.addEventListener('input', render);
 downloadButton.addEventListener('click', downloadPdf);
 document.addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
@@ -29,99 +25,48 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-function loadChords() {
+// Migrates the pre-text-interface JSON array format on first load.
+function loadText() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored === null) return '';
   try {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (Array.isArray(stored) && stored.length <= PAGE_CAPACITY && stored.every(isValidChord)) {
-      return stored;
+    const parsed = JSON.parse(stored);
+    if (Array.isArray(parsed)) {
+      return parsed
+        .filter((c) => typeof c?.name === 'string' && typeof c?.tab === 'string')
+        .map((c) => `${c.name} ${c.tab}`)
+        .join('\n');
     }
   } catch {
-    // corrupt stored state: fall through and start empty
+    // not JSON: already plain text
   }
-  return [];
+  return stored;
 }
 
-function isValidChord(c) {
-  if (typeof c?.name !== 'string' || c.name.trim() === '' || typeof c?.tab !== 'string') return false;
-  const parsed = parseTab(c.tab);
-  return parsed.ok && fretWindow(parsed.strings).ok;
-}
+function render() {
+  const result = textToChords(editor.value);
+  chords = result.chords;
+  localStorage.setItem(STORAGE_KEY, editor.value);
 
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(chords));
-}
+  const shown = result.errors
+    .slice(0, SHOWN_ERRORS)
+    .map((e) => `Line ${e.line}: ${e.message}`);
+  const hidden = result.errors.length - shown.length;
+  errorLine.textContent = hidden > 0 ? `${shown.join(' · ')} (+${hidden} more)` : shown.join(' · ');
 
-export function chordSvg({ name, tab }) {
-  const { strings } = parseTab(tab);
-  const { baseFret } = fretWindow(strings);
-  return drawChord(name, strings, baseFret);
-}
-
-function validateInput() {
-  const parsed = parseTab(tabInput.value);
-  if (!parsed.ok) return parsed;
-  const win = fretWindow(parsed.strings);
-  if (!win.ok) return win;
-  return { ok: true, strings: parsed.strings, baseFret: win.baseFret };
-}
-
-function renderLivePreview() {
-  livePreview.replaceChildren();
-  showError('');
-  if (tabInput.value.trim() === '') return;
-  const result = validateInput();
-  if (!result.ok) { showError(result.error); return; }
-  const svg = drawChord(nameInput.value.trim() || '?', result.strings, result.baseFret);
-  svg.setAttribute('width', '64');
-  svg.setAttribute('height', '57');
-  livePreview.append(svg);
-}
-
-function commit() {
-  const name = nameInput.value.trim();
-  if (!name) { showError('Enter a chord name'); nameInput.focus(); return; }
-  const result = validateInput();
-  if (!result.ok) { showError(result.error); return; }
-  if (chords.length >= PAGE_CAPACITY) { showError(`Page full (${PAGE_CAPACITY} chords)`); return; }
-
-  chords.push({ name, tab: tabInput.value.trim() });
-  save();
-  renderPage();
-  nameInput.value = '';
-  tabInput.value = '';
-  livePreview.replaceChildren();
-  showError('');
-  nameInput.focus();
-}
-
-function removeChord(index) {
-  chords.splice(index, 1);
-  save();
-  renderPage();
-  showError('');
-}
-
-function renderPage() {
   page.replaceChildren();
-  chords.forEach((chord, index) => {
-    const cell = document.createElement('div');
-    cell.className = 'relative group';
+  for (const chord of chords) {
     const svg = chordSvg(chord);
     svg.setAttribute('width', '135');
     svg.setAttribute('height', '120');
-    const remove = document.createElement('button');
-    remove.textContent = '✕';
-    remove.title = `Remove ${chord.name}`;
-    remove.className =
-      'absolute top-0 right-0 hidden group-hover:block text-gray-400 hover:text-red-600 text-xs px-1';
-    remove.addEventListener('click', () => removeChord(index));
-    cell.append(svg, remove);
-    page.append(cell);
-  });
+    page.append(svg);
+  }
 }
 
-function showError(message) {
-  errorLine.textContent = message;
+function chordSvg({ name, tab }) {
+  const { strings } = parseTab(tab);
+  const { baseFret } = fretWindow(strings);
+  return drawChord(name, strings, baseFret);
 }
 
 async function downloadPdf() {
@@ -135,4 +80,8 @@ async function downloadPdf() {
     await doc.svg(chordSvg(chord), { x, y, width, height });
   }
   doc.save('chord-chart.pdf');
+}
+
+function showError(message) {
+  errorLine.textContent = message;
 }

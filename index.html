@@ -10,26 +10,28 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
   <main class="max-w-4xl mx-auto p-6 space-y-4">
-    <header class="flex items-end gap-3">
-      <div>
-        <label for="name" class="block text-xs font-medium text-gray-500">Chord name</label>
-        <input id="name" autocomplete="off" autofocus
-               class="w-32 rounded border border-gray-300 font-mono px-2 py-1" placeholder="Am7">
-      </div>
-      <div>
-        <label for="tab" class="block text-xs font-medium text-gray-500">Strings (low E &rarr; high E)</label>
-        <input id="tab" autocomplete="off"
-               class="w-40 rounded border border-gray-300 font-mono px-2 py-1" placeholder="x02010">
-      </div>
-      <div id="live-preview" class="w-16 h-16"></div>
-      <button id="download"
-              class="ml-auto bg-blue-600 hover:bg-blue-700 text-white rounded px-3 py-1.5 text-sm font-medium">
-        Download PDF
-      </button>
+    <header>
+      <label for="editor" class="block text-xs font-medium text-gray-500 mb-1">
+        Chords &mdash; one per line: name, space, strings low E &rarr; high E (e.g. <code>Am7 x02010</code>)
+      </label>
+      <textarea id="editor" rows="6" autofocus autocomplete="off" spellcheck="false"
+                class="w-full rounded border border-gray-300 font-mono text-sm px-3 py-2 resize-y"
+                placeholder="Am7 x02010&#10;Bm7 x24232"></textarea>
     </header>
     <p id="error" class="text-sm text-red-600 h-5"></p>
-    <div id="page" class="bg-white shadow mx-auto grid grid-cols-4 content-start box-content"
-         style="width: 540px; height: 720px; padding: 36px;"></div>
+    <div class="relative group mx-auto w-fit">
+      <div id="page" class="bg-white shadow grid grid-cols-4 content-start box-content"
+           style="width: 540px; height: 720px; padding: 36px;"></div>
+      <button id="download" aria-label="Download PDF" title="Download PDF"
+              class="absolute bottom-3 right-3 flex items-center justify-center w-10 h-10 rounded-full
+                     bg-blue-600 hover:bg-blue-700 text-white shadow-lg opacity-0
+                     group-hover:opacity-100 focus-visible:opacity-100 transition-opacity">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5" aria-hidden="true">
+          <path d="M12 4v10m0 0l-4-4m4 4l4-4M4 18h16"/>
+        </svg>
+      </button>
+    </div>
   </main>
   <script type="module" src="src/app.js"></script>
 </body>

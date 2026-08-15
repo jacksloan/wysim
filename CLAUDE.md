@@ -10,7 +10,7 @@ The MVP is implemented (static app in `index.html` + `src/` with vitest tests in
 
 A tool to quickly create guitar chord chart diagrams, outputting a PDF for 8.5x11 paper. Key requirements from `docs/superpowers/specs/2026-08-15-chord-chart-mvp-design.md` (original idea sketch in `plan.md`):
 
-- **Interface**: two text inputs — a user-defined chord name, and a strings input where `X` = muted string, `O` = open string, and a number marks the fret the shape starts on. It should feel snappy and developer-friendly, like a good CLI.
+- **Interface**: a single textarea, one chord per line as `Name<space>tabstring` (e.g. `Am7 x02010`; `X`/`x` = muted, `O`/`o`/`0` = open, digits = frets). The page re-renders live from the text, which is the single source of truth. It should feel snappy and developer-friendly, like a good CLI.
 - **Architecture**: a single `index.html`, no framework. Tailwind CSS for styling. Web components are allowed where they help abstract reusable parts.
 - **Output**: PDF sized for 8.5x11 paper, drawn with whichever PDF library is best for simple lines/shapes, with a live PDF preview rendering the output.
 
