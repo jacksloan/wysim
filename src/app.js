@@ -98,6 +98,7 @@ function removeChord(index) {
   chords.splice(index, 1);
   save();
   renderPage();
+  showError('');
 }
 
 function renderPage() {
@@ -124,10 +125,11 @@ function showError(message) {
 }
 
 async function downloadPdf() {
-  // Wired fully in the PDF export task; jsPDF is not loaded yet.
-  if (!window.jspdf) { showError('PDF export not wired up yet'); return; }
-  const { jsPDF } = window.jspdf;
+  const jspdfGlobal = window.jspdf;
+  if (!jspdfGlobal) { showError('PDF library failed to load'); return; }
+  const { jsPDF } = jspdfGlobal;
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+  if (typeof doc.svg !== 'function') { showError('PDF library failed to load'); return; }
   for (const [index, chord] of chords.entries()) {
     const { x, y, width, height } = cellRect(index);
     await doc.svg(chordSvg(chord), { x, y, width, height });

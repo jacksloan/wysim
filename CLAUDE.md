@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-This is a greenfield project — no application code exists yet. `plan.md` is the spec; read it before building anything.
+The MVP is implemented (static app in `index.html` + `src/` with vitest tests in `tests/`), and the binding spec is `docs/superpowers/specs/2026-08-15-chord-chart-mvp-design.md` (implementation plan in `docs/superpowers/plans/2026-08-15-chord-chart-mvp.md`).
 
 ## What this project is
 
-A tool to quickly create guitar chord chart diagrams, outputting a PDF for 8.5x11 paper. Key requirements from `plan.md`:
+A tool to quickly create guitar chord chart diagrams, outputting a PDF for 8.5x11 paper. Key requirements from `docs/superpowers/specs/2026-08-15-chord-chart-mvp-design.md` (original idea sketch in `plan.md`):
 
 - **Interface**: two text inputs — a user-defined chord name, and a strings input where `X` = muted string, `O` = open string, and a number marks the fret the shape starts on. It should feel snappy and developer-friendly, like a good CLI.
 - **Architecture**: a single `index.html`, no framework. Tailwind CSS for styling. Web components are allowed where they help abstract reusable parts.
