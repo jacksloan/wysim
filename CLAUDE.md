@@ -24,6 +24,5 @@ Package manager is **pnpm** (pinned via `packageManager` in `package.json`).
 
 ## Repository layout
 
-- `plan.md` — the project spec. The source of truth for requirements.
-- `examples/` — reference images of chord charts (a JPG and a PDF) to consult for the visual style of the diagrams before building.
-- `conchord/` — a vendored copy of the third-party [conchord](https://github.com/sitandr/conchord) Typst package (v0.4.0), included as **reference material only**. It is written in Typst, not JavaScript, and is not part of the app. It's useful for its chord-diagram conventions: the compact tabstring format (e.g. `x32010` — `x` muted, `0` open, digits = frets, comma-separated above fret 9), barre placement logic ("shadow barre"), thick nut for open-position chords, fret-number labels for shifted shapes, and chord-name auto-scaling. See `conchord/chords/draw-chord.typ` for the diagram-drawing logic.
+- `plan.md` — the original idea sketch (the binding spec is in `docs/superpowers/specs/`).
+- `examples/`, `conchord/` — **local-only, gitignored** reference material (may be absent in fresh clones): third-party chord chart images, and a copy of the [conchord](https://github.com/sitandr/conchord) Typst package whose diagram conventions (tabstring format, thick nut, fret labels, name auto-scaling) informed the renderer. Both were scrubbed from git history before publishing; never commit them.
