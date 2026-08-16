@@ -20,7 +20,7 @@ x02210
 - `1`–`9` — fret number; use the comma form (`x,9,7,8,9,9`) for shapes at fret 10 and above
 - Shapes above the 5th fret shift automatically and get a fret label (e.g. `7fr`)
 - A line that is just a tabstring renders the diagram with no name
-- `# Title` / `## Subtitle` render centered at the top of the page (the grid gives up one row to make room)
+- `# Title` / `## Subtitle` render centered at the top of the page (the grid gives up one row to make room). Because `#` starts a title line, a chord name can't begin with `#` — write `sharp5 x13454x` style names instead
 
 The page preview re-renders as you type. Invalid lines are skipped and reported inline with their line number; valid lines always render. Your chart persists in the browser between visits.
 
