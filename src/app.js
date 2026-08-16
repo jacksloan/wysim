@@ -83,7 +83,7 @@ async function downloadPdf() {
     const { x, y, width, height } = grid.cellRect(index);
     await doc.svg(chordSvg(chord), { x, y, width, height });
   }
-  doc.save('chord-chart.pdf');
+  doc.save('wysim-chord-chart.pdf');
 }
 
 function showError(message) {

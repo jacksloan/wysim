@@ -31,7 +31,7 @@ The gear button (hover the preview, upper right) opens chart settings with three
 
 ### PDF export
 
-The download button (hover the preview, lower right) or **Cmd/Ctrl+S** saves `chord-chart.pdf` — a vector 8.5×11" page that matches the preview exactly. Diagrams and text stay crisp at any zoom.
+The download button (hover the preview, lower right) or **Cmd/Ctrl+S** saves `wysim-chord-chart.pdf` — a vector 8.5×11" page that matches the preview exactly. Diagrams and text stay crisp at any zoom.
 
 ## Running it
 
