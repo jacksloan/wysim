@@ -2,6 +2,7 @@ import { parseTab } from './parse.js';
 import { fretWindow, gridFor, storedToDensity, PAGE, HEADER_BAND } from './layout.js';
 import { drawChord, drawHeader } from './draw.js';
 import { textToChords, storedToText } from './text.js';
+import { detectName, storedToAutoName } from './name.js';
 
 const STORAGE_KEY = 'chord-chart-v1';
 const SETTINGS_KEY = 'chord-chart-settings-v1';
@@ -17,6 +18,11 @@ const settingsDialog = document.getElementById('settings-dialog');
 let chords = [];
 let header = { title: null, subtitle: null };
 let density = storedToDensity(localStorage.getItem(SETTINGS_KEY));
+let autoName = storedToAutoName(localStorage.getItem(SETTINGS_KEY));
+
+function saveSettings() {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ density, autoName }));
+}
 
 function hasHeader() {
   return header.title !== null || header.subtitle !== null;
@@ -36,12 +42,18 @@ document.addEventListener('keydown', (e) => {
 
 settingsButton.addEventListener('click', () => {
   settingsDialog.querySelector(`input[name="density"][value="${density}"]`).checked = true;
+  settingsDialog.querySelector('input[name="autoName"]').checked = autoName;
   settingsDialog.showModal();
 });
 settingsDialog.addEventListener('change', (e) => {
-  if (e.target.name !== 'density') return;
-  density = e.target.value;
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ density }));
+  if (e.target.name === 'density') {
+    density = e.target.value;
+  } else if (e.target.name === 'autoName') {
+    autoName = e.target.checked;
+  } else {
+    return;
+  }
+  saveSettings();
   render();
 });
 settingsDialog.addEventListener('click', (e) => {
@@ -85,6 +97,10 @@ function render() {
 function chordSvg({ name, tab }) {
   const { strings } = parseTab(tab);
   const { baseFret } = fretWindow(strings);
+  if (name === '' && autoName) {
+    const detected = detectName(tab);
+    if (detected) return drawChord(detected, strings, baseFret, { autoName: true });
+  }
   return drawChord(name, strings, baseFret);
 }
 

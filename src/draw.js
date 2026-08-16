@@ -9,15 +9,17 @@ const BOTTOM = 107;
 const STRING_GAP = (RIGHT - LEFT) / 5; // 15
 const FRET_GAP = (BOTTOM - TOP) / 5;   // 15
 
-export function drawChord(name, strings, baseFret) {
+export function drawChord(name, strings, baseFret, { autoName = false } = {}) {
   const svg = el('svg', { viewBox: '0 0 135 120', xmlns: NS });
 
-  // Chord name (optional), auto-shrunk so long names stay inside the diagram width
+  // Chord name (optional), auto-shrunk so long names stay inside the diagram
+  // width; auto-detected names render muted so they read as inferred.
   if (name) {
     const fontSize = Math.max(7, 13 - Math.max(0, name.length - 6));
     svg.append(el('text', {
       x: 67.5, y: 16, 'text-anchor': 'middle', 'font-size': fontSize,
       'font-weight': 'bold', 'font-family': FONT,
+      ...(autoName && { fill: '#888888' }),
     }, name));
   }
 
