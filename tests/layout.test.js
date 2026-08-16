@@ -84,6 +84,37 @@ describe('gridFor', () => {
   });
 });
 
+describe('gridFor with a header band', () => {
+  it('normal loses one row to the header', () => {
+    const grid = gridFor('normal', { header: true });
+    expect(grid.rows).toBe(5);
+    expect(grid.capacity).toBe(20);
+    expect(grid.cell).toEqual({ width: 135, height: 120 });
+    expect(grid.cellRect(0)).toEqual({ x: 36, y: 92, width: 135, height: 120 });
+  });
+
+  it('compact loses one row to the header', () => {
+    const grid = gridFor('compact', { header: true });
+    expect(grid.rows).toBe(6);
+    expect(grid.capacity).toBe(30);
+    expect(grid.cellRect(0).y).toBe(92);
+  });
+
+  it('spacious keeps all four rows under the header', () => {
+    const grid = gridFor('spacious', { header: true });
+    expect(grid.rows).toBe(4);
+    expect(grid.capacity).toBe(12);
+    expect(grid.cellRect(0).y).toBe(92);
+  });
+
+  it('no header option matches the plain call', () => {
+    const a = gridFor('normal', { header: false });
+    const b = gridFor('normal');
+    expect([a.columns, a.rows, a.capacity, a.cell, a.cellRect(0)])
+      .toEqual([b.columns, b.rows, b.capacity, b.cell, b.cellRect(0)]);
+  });
+});
+
 describe('storedToDensity', () => {
   it('reads a stored density', () => {
     expect(storedToDensity('{"density":"compact"}')).toBe('compact');

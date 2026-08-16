@@ -1,6 +1,6 @@
 import { parseTab } from './parse.js';
-import { fretWindow, gridFor, storedToDensity } from './layout.js';
-import { drawChord } from './draw.js';
+import { fretWindow, gridFor, storedToDensity, PAGE, HEADER_BAND } from './layout.js';
+import { drawChord, drawHeader } from './draw.js';
 import { textToChords, storedToText } from './text.js';
 
 const STORAGE_KEY = 'chord-chart-v1';
@@ -15,7 +15,12 @@ const settingsButton = document.getElementById('settings');
 const settingsDialog = document.getElementById('settings-dialog');
 
 let chords = [];
+let header = { title: null, subtitle: null };
 let density = storedToDensity(localStorage.getItem(SETTINGS_KEY));
+
+function hasHeader() {
+  return header.title !== null || header.subtitle !== null;
+}
 
 editor.value = storedToText(localStorage.getItem(STORAGE_KEY));
 render();
@@ -45,9 +50,13 @@ settingsDialog.addEventListener('click', (e) => {
 });
 
 function render() {
-  const grid = gridFor(density);
-  const result = textToChords(editor.value, grid.capacity);
+  const result = textToChords(
+    editor.value,
+    (state) => gridFor(density, { header: state.hasHeader }).capacity,
+  );
   chords = result.chords;
+  header = { title: result.title, subtitle: result.subtitle };
+  const grid = gridFor(density, { header: hasHeader() });
   localStorage.setItem(STORAGE_KEY, editor.value);
 
   const shown = result.errors
@@ -58,6 +67,13 @@ function render() {
 
   page.style.gridTemplateColumns = `repeat(${grid.columns}, 1fr)`;
   page.replaceChildren();
+  if (hasHeader()) {
+    const band = drawHeader(header.title, header.subtitle);
+    band.setAttribute('width', '540');
+    band.setAttribute('height', String(HEADER_BAND));
+    band.style.gridColumn = '1 / -1';
+    page.append(band);
+  }
   for (const chord of chords) {
     const svg = chordSvg(chord);
     svg.setAttribute('width', String(grid.cell.width));
@@ -78,7 +94,12 @@ async function downloadPdf() {
   const { jsPDF } = jspdfGlobal;
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
   if (typeof doc.svg !== 'function') { showError('PDF library failed to load'); return; }
-  const grid = gridFor(density);
+  const grid = gridFor(density, { header: hasHeader() });
+  if (hasHeader()) {
+    await doc.svg(drawHeader(header.title, header.subtitle), {
+      x: PAGE.margin, y: PAGE.margin, width: 540, height: HEADER_BAND,
+    });
+  }
   for (const [index, chord] of chords.entries()) {
     const { x, y, width, height } = grid.cellRect(index);
     await doc.svg(chordSvg(chord), { x, y, width, height });

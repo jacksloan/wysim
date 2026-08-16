@@ -29,14 +29,19 @@ export const DENSITIES = {
   spacious: { columns: 3 },
 };
 
-export function gridFor(density) {
+// Vertical space reserved at the top of the content area when the chart
+// has a title and/or subtitle.
+export const HEADER_BAND = 56;
+
+export function gridFor(density, { header = false } = {}) {
   // The shipped column counts (3, 4, 5) divide the 540pt content width into
   // whole points and the 8:9 cell ratio keeps heights integral; a new density
   // whose columns don't divide 540 cleanly would produce sub-pixel cells.
   const { columns } = DENSITIES[density] ?? DENSITIES.normal;
   const width = (PAGE.width - 2 * PAGE.margin) / columns;
   const height = width * (CELL.height / CELL.width);
-  const rows = Math.floor((PAGE.height - 2 * PAGE.margin) / height);
+  const top = PAGE.margin + (header ? HEADER_BAND : 0);
+  const rows = Math.floor((PAGE.height - PAGE.margin - top) / height);
   return {
     columns,
     rows,
@@ -47,7 +52,7 @@ export function gridFor(density) {
       const row = Math.floor(index / columns);
       return {
         x: PAGE.margin + col * width,
-        y: PAGE.margin + row * height,
+        y: top + row * height,
         width,
         height,
       };

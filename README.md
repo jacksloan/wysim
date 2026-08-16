@@ -4,18 +4,23 @@ A fast, text-driven guitar chord chart generator. Type chords as plain text, wat
 
 ## Chord Charts
 
-Each line of the editor is one chord: a name, a space, and a tabstring (low E → high E).
+Each line of the editor is one chord: an optional name, a space, and a tabstring (low E → high E). Lines starting with `#` and `##` set the chart's title and subtitle.
 
 ```
+# Campfire Set
+## Week 3 — open chords
 Am7 x02010
 Bm7 x24232
 F#m/C# x,9,7,8,9,9
+x02210
 ```
 
 - `x`/`X` — muted string
 - `0`/`o`/`O` — open string
 - `1`–`9` — fret number; use the comma form (`x,9,7,8,9,9`) for shapes at fret 10 and above
 - Shapes above the 5th fret shift automatically and get a fret label (e.g. `7fr`)
+- A line that is just a tabstring renders the diagram with no name
+- `# Title` / `## Subtitle` render centered at the top of the page (the grid gives up one row to make room)
 
 The page preview re-renders as you type. Invalid lines are skipped and reported inline with their line number; valid lines always render. Your chart persists in the browser between visits.
 

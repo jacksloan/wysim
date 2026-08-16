@@ -12,12 +12,14 @@ const FRET_GAP = (BOTTOM - TOP) / 5;   // 15
 export function drawChord(name, strings, baseFret) {
   const svg = el('svg', { viewBox: '0 0 135 120', xmlns: NS });
 
-  // Chord name, auto-shrunk so long names stay inside the diagram width
-  const fontSize = Math.max(7, 13 - Math.max(0, name.length - 6));
-  svg.append(el('text', {
-    x: 67.5, y: 16, 'text-anchor': 'middle', 'font-size': fontSize,
-    'font-weight': 'bold', 'font-family': FONT,
-  }, name));
+  // Chord name (optional), auto-shrunk so long names stay inside the diagram width
+  if (name) {
+    const fontSize = Math.max(7, 13 - Math.max(0, name.length - 6));
+    svg.append(el('text', {
+      x: 67.5, y: 16, 'text-anchor': 'middle', 'font-size': fontSize,
+      'font-weight': 'bold', 'font-family': FONT,
+    }, name));
+  }
 
   // Marker row: drawn shapes, not text glyphs, so the PDF export stays font-safe
   strings.forEach((s, i) => {
@@ -56,6 +58,26 @@ export function drawChord(name, strings, baseFret) {
     svg.append(el('circle', { cx: x, cy: y, r: 5, fill: 'black' }));
   });
 
+  return svg;
+}
+
+// Title/subtitle band rendered above the chord grid; sized to the page
+// content width and layout.js's HEADER_BAND height.
+export function drawHeader(title, subtitle) {
+  const svg = el('svg', { viewBox: '0 0 540 56', xmlns: NS });
+  if (title) {
+    const fontSize = Math.max(11, 20 - Math.max(0, title.length - 40) * 0.4);
+    svg.append(el('text', {
+      x: 270, y: 26, 'text-anchor': 'middle', 'font-size': fontSize,
+      'font-weight': 'bold', 'font-family': FONT,
+    }, title));
+  }
+  if (subtitle) {
+    svg.append(el('text', {
+      x: 270, y: 46, 'text-anchor': 'middle', 'font-size': 12,
+      fill: '#555555', 'font-family': FONT,
+    }, subtitle));
+  }
   return svg;
 }
 

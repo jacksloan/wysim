@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { textToChords, storedToText } from '../src/text.js';
 
+const EMPTY_HEADER = { title: null, subtitle: null };
+
 describe('textToChords', () => {
   it('parses one chord per line as "Name tabstring"', () => {
     expect(textToChords('Am7 5X5555\nBm7 7X7777')).toEqual({
@@ -9,6 +11,7 @@ describe('textToChords', () => {
         { name: 'Bm7', tab: '7X7777' },
       ],
       errors: [],
+      ...EMPTY_HEADER,
     });
   });
 
@@ -16,6 +19,7 @@ describe('textToChords', () => {
     expect(textToChords('F#m/C# x,9,7,8,9,9')).toEqual({
       chords: [{ name: 'F#m/C#', tab: 'x,9,7,8,9,9' }],
       errors: [],
+      ...EMPTY_HEADER,
     });
   });
 
@@ -23,17 +27,19 @@ describe('textToChords', () => {
     expect(textToChords('\n  Am x02210  \n\n')).toEqual({
       chords: [{ name: 'Am', tab: 'x02210' }],
       errors: [],
+      ...EMPTY_HEADER,
     });
   });
 
   it('returns an empty result for empty text', () => {
-    expect(textToChords('')).toEqual({ chords: [], errors: [] });
+    expect(textToChords('')).toEqual({ chords: [], errors: [], ...EMPTY_HEADER });
   });
 
   it('reports a line with the wrong number of tokens', () => {
     expect(textToChords('Am')).toEqual({
       chords: [],
       errors: [{ line: 1, message: 'Expected "Name tabstring"' }],
+      ...EMPTY_HEADER,
     });
     expect(textToChords('A minor x02210').errors).toEqual([
       { line: 1, message: 'Expected "Name tabstring"' },
@@ -44,6 +50,7 @@ describe('textToChords', () => {
     expect(textToChords('Am x02210\nC x3201')).toEqual({
       chords: [{ name: 'Am', tab: 'x02210' }],
       errors: [{ line: 2, message: 'Expected 6 strings (low E to high E)' }],
+      ...EMPTY_HEADER,
     });
   });
 
@@ -51,6 +58,7 @@ describe('textToChords', () => {
     expect(textToChords('Bad 2xxxx7')).toEqual({
       chords: [],
       errors: [{ line: 1, message: 'Shape spans more than 5 frets' }],
+      ...EMPTY_HEADER,
     });
   });
 
@@ -90,6 +98,91 @@ describe('textToChords', () => {
     expect(result.errors).toEqual([
       { line: 3, message: 'Page full (2 chords)' },
     ]);
+  });
+});
+
+describe('textToChords titles and subtitles', () => {
+  it('parses a title and subtitle from # and ## lines', () => {
+    expect(textToChords('# Campfire Set\n## Week 3\nAm x02210')).toEqual({
+      chords: [{ name: 'Am', tab: 'x02210' }],
+      errors: [],
+      title: 'Campfire Set',
+      subtitle: 'Week 3',
+    });
+  });
+
+  it('allows a subtitle without a title and vice versa', () => {
+    expect(textToChords('## Just a subtitle').subtitle).toBe('Just a subtitle');
+    expect(textToChords('## Just a subtitle').title).toBe(null);
+    expect(textToChords('# Just a title').title).toBe('Just a title');
+    expect(textToChords('# Just a title').subtitle).toBe(null);
+  });
+
+  it('reports duplicate title and subtitle lines as errors, first one wins', () => {
+    const result = textToChords('# One\n# Two\n## A\n## B');
+    expect(result.title).toBe('One');
+    expect(result.subtitle).toBe('A');
+    expect(result.errors).toEqual([
+      { line: 2, message: 'Title already set' },
+      { line: 4, message: 'Subtitle already set' },
+    ]);
+  });
+
+  it('title lines appear anywhere in the text', () => {
+    const result = textToChords('Am x02210\n# Late Title');
+    expect(result.title).toBe('Late Title');
+    expect(result.chords).toHaveLength(1);
+  });
+});
+
+describe('textToChords nameless chords', () => {
+  it('renders a bare tabstring line as a chord with an empty name', () => {
+    expect(textToChords('x02210')).toEqual({
+      chords: [{ name: '', tab: 'x02210' }],
+      errors: [],
+      ...EMPTY_HEADER,
+    });
+  });
+
+  it('accepts bare comma-form tabstrings', () => {
+    expect(textToChords('x,9,7,8,9,9').chords).toEqual([
+      { name: '', tab: 'x,9,7,8,9,9' },
+    ]);
+  });
+
+  it('rejects a single token that is not a tabstring', () => {
+    expect(textToChords('Am').errors).toEqual([
+      { line: 1, message: 'Expected "Name tabstring"' },
+    ]);
+  });
+
+  it('applies the span rule to bare tabstrings', () => {
+    expect(textToChords('2xxxx7').errors).toEqual([
+      { line: 1, message: 'Shape spans more than 5 frets' },
+    ]);
+  });
+});
+
+describe('textToChords capacity as a function of header presence', () => {
+  const capacityFor = ({ hasHeader }) => (hasHeader ? 1 : 2);
+
+  it('uses the no-header capacity when there is no title or subtitle', () => {
+    const result = textToChords('Am x02210\nC x32010', capacityFor);
+    expect(result.chords).toHaveLength(2);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('uses the header capacity when a title is present', () => {
+    const result = textToChords('# T\nAm x02210\nC x32010', capacityFor);
+    expect(result.chords).toHaveLength(1);
+    expect(result.errors).toEqual([
+      { line: 3, message: 'Page full (1 chords)' },
+    ]);
+  });
+
+  it('a subtitle alone also counts as a header', () => {
+    const result = textToChords('## S\nAm x02210\nC x32010', capacityFor);
+    expect(result.chords).toHaveLength(1);
   });
 });
 
